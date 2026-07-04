@@ -15,7 +15,7 @@
   programs.bash = {
   enable = true;
   shellAliases = {
-    nrs = "sudo nixos-rebuild ~/nixos-config switch";
+    nrs = "sudo nixos-rebuild switch";
     hyprbackup = "sudo cp ~/.config/hypr/hyprland.lua ~/.config/hypr/hyprlandBACKUP.lua";
     };
   initExtra = ''
