@@ -1,6 +1,9 @@
 # BugNix
 This is my personal NixOS config that I use for Gamedev, Gaming, and Vtubing. It's currently very messy, but I am working on cleaning it up. 
 
+![BugNix Desktop](https://github.com/bugeenka/BugNix/blob/main/Desktop.png?raw=true)
+
+
 # My Setup
 I am running NixOS bare metal on my desktop machine. I run it dual booted with Windows 11 using systemd-boot. 
 
