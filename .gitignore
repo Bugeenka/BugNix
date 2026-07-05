@@ -4,5 +4,4 @@ result-*
 .pre-commit-config.yaml
 *.qcow2
 secrets.nix
-configuration.nix
-hardware-configuration.nix
+
