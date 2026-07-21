@@ -16,6 +16,7 @@
   enable = true;
   shellAliases = {
     nrs = "sudo nixos-rebuild switch";
+    nrsf = "sudo nixos-rebuild switch --flake /etc/nixos/#NIXBUG";
     hyprbackup = "sudo cp ~/.config/hypr/hyprland.lua ~/.config/hypr/hyprlandBACKUP.lua";
     };
   initExtra = ''
@@ -24,18 +25,16 @@
   '';
   };
 
-#KITTY CONFIG  
-  programs.kitty = {
+
+
+
+
+
+  programs.vicinae = {
     enable = true;
-    settings = {
-      background_opacity = "0.8";
-      confirm_os_window_close = "0";
-	
-    };
-#	font.size = 18;
+    systemd.enable = true;
 
-
-};
+  };
 
 #HYPR CONFIG
 wayland.windowManager.hyprland = {
@@ -58,11 +57,7 @@ wayland.windowManager.hyprland = {
 
     # Startup Apps
     exec-once = [
-      "hyprlock"
-
-      "awww-daemon"
-
-      "waybar"
+     
     ];
 
     bindm = [
@@ -248,6 +243,7 @@ wayland.windowManager.hyprland = {
     settings = {
       general.hide_cursor = true;
       general.ignore_empty_input = true;
+      general.fail_timeout = 200;
       animations = {
 	enabled = true;
 	fade_in = {
@@ -275,6 +271,7 @@ wayland.windowManager.hyprland = {
 	outline_thickness = 6;
 	placeholder_text = ":3";
 	shadow_passes = 1;
+	rounding = 0;
       }
     ];
   };
@@ -313,6 +310,7 @@ wayland.windowManager.hyprland = {
       "image/x-png"                = [ "swayimg.desktop" ];
       "image/x-portable-pixmap"    = [ "swayimg.desktop" ];
       "image/x-tga"                = [ "swayimg.desktop" ];
+      "inode/directory"            = [ "org.gnome.Nautilus.desktop" ];
   };
 };
 # USER LEVEL PACKAGES
@@ -333,6 +331,7 @@ wayland.windowManager.hyprland = {
     gimp
     audacity
     chatterino2
+    hyprlock
 
 ];
 

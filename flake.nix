@@ -3,6 +3,11 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    niri.url = "github:sodiboo/niri-flake";
+    noctalia = {
+      url = "github:noctalia-dev/noctalia";
+      inputs.nixpkgs.follows = "nixpkgs";
+  };
 
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -15,12 +20,13 @@
     };
   };
 
-  outputs = { nixpkgs, home-manager, spicetify-nix, ... } @ inputs: {
+  outputs = { self, nixpkgs, home-manager, spicetify-nix, ... } @ inputs: {
     nixosConfigurations.NIXBUG = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       specialArgs = { inherit inputs; };
       modules = [
         ./configuration.nix
+        inputs.niri.nixosModules.niri
         home-manager.nixosModules.default
         {
 	  home-manager.useUserPackages= true;

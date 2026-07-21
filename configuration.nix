@@ -11,42 +11,25 @@
     ];
 
 
-
+  #NIX SETTINGS
   nixpkgs.config.allowUnfree = true;
   nixpkgs.config.checkPhase = "";
-  
+  nixpkgs.config.allowUnsupportedSystem = true;
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+  # KERNEL   
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-
-
-#  GRUB DISABLED
-#  boot.loader.grub.device = "nodev";
-#  boot.loader.grub.efiSupport = true;
-#  boot.loader.grub.useOSProber = true;
-#  boot.loader.grub.extraEntries = ''
-#    menuentry "Windows" {
-#      insmod part_gpt
-#      insmod fat
-#      insmod chain
-#      search --no-floppy --fs-uuid --set=root 1234-5678
-#      chainloader /EFI/Microsoft/Boot/bootmgfw.efi
-#}
-#'';
-#  boot.loader.grub.extraGrubInstallArgs = [ "--no-floppy" ];
- 
- 
-  # Use latest kernel.
   boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernelModules = [ "uinput" ];
+  boot.initrd.kernelModules = [ "amdgpu" ];
 
-  # Mount drives
+  # STORAGE DRIVES
   fileSystems."/mnt/thiccy" = {
     device = "/dev/disk/by-uuid/427E40AB527973B5";
     fsType = "ntfs";
     options = [ "uid=1000" "gid=1000" "rw" "users" "exec" "umask=003" "nofail" ];
 };
-
-  # KERNEL MODULES
-  boot.kernelModules = [ "uinput" ];
 
   ## HOSTNAME
   networking.hostName = "NIXBUG";
@@ -54,7 +37,10 @@
   ## Networks
   networking.networkmanager.enable = true;
   networking.firewall.enable = false;
-
+  networking.firewall.allowedTCPPorts = [ 16262 ];
+  networking.firewall.allowedUDPPorts = [ 49983 39539
+   ];
+  networking.nameservers = [ "1.1.1.1" "1.0.0.1" ];
   hardware = {
 
     bluetooth = {
@@ -63,30 +49,48 @@
   };
 };
 
-
+# GPU STUFF
   hardware = { 
     graphics.enable = true;
     graphics.enable32Bit = true;
-    
+    amdgpu = {
+      overdrive.enable = false;
+
+  };
 };
 
+  ## PERIPHERALS
+  hardware.openrazer.enable = true;
+  hardware.openrazer.users = [ "DeitaBug" ];
+ 
+  
   ## Time Zone.
   time.timeZone = "US/Pacific";
 
+  ## VM STUFF
+  virtualisation.libvirtd = {
+    enable =true;
+    qemu.vhostUserPackages = with pkgs; [ virtiofsd ];
+  };
+  
+  programs.virt-manager.enable = true;
+  networking.firewall.trustedInterfaces = [ "virbr0" ];  
 
-
+  
 environment.systemPackages = with pkgs; [
   git
   os-prober
   vim
+  wget
   blueman
-  obs-studio
-  obs-cmd
   steam
   scarlett2
+  pavucontrol
+  dnsmasq
+  alsa-scarlett-gui
   vesktop
   networkmanagerapplet
-  flatpak
+  # flatpak
   unzip
   zip
   wine
@@ -94,6 +98,8 @@ environment.systemPackages = with pkgs; [
   wine
   winetricks
   bottles
+  qemu
+  virt-manager
   pulse-visualizer
   gvfs
   cifs-utils
@@ -102,6 +108,10 @@ environment.systemPackages = with pkgs; [
   wev
   vscodium
   github-desktop
+  remmina
+  jq
+  openrazer-daemon
+  razergenie
 ];
 
 
@@ -114,11 +124,12 @@ environment.systemPackages = with pkgs; [
       alsa.enable = true;
       pulse.enable = true;
       alsa.support32Bit = true;
+      wireplumber.enable = true;
       
     };
     power-profiles-daemon.enable = true;
     upower.enable = true;
-    flatpak.enable = true;
+    # flatpak.enable = true;
   
     gvfs.enable = true;
     tumbler.enable = true;    
@@ -167,37 +178,51 @@ environment.systemPackages = with pkgs; [
 # SECURITY
   security.rtkit.enable = true;
   security.polkit.enable = true;
+  security.pam.loginLimits = [
+  
+   {
+      domain = "DeitaBug";
+      type = "-";
+      item = "nice";
+      value = "-10";
 
+   }
+];
 
 # USERS
 
       users.users.DeitaBug = {
       isNormalUser = true;
       home = "/home/deitabug";
-      extraGroups = [ "wheel" "video" "audio" "networkmanager" "input" "plugdev" ];
+      extraGroups = [ "tty" "wheel" "video" "audio" "networkmanager" "input" "plugdev" "render" "libvirtd" ];
       packages = with pkgs; [
         tree
       ];
    };
+
+#  programs.niri.settings.binds = {
+#    "Mod+Return".action.spawn = "kitty";
+#    "Mod+Space".action.spawn = "hyprlauncher";
+#  };
+
+
+
+
 # FIREFOX CONFIG
   programs.firefox.enable = true;
   
-# HYPRLAND CONFIG  
-  programs.hyprland = {
-    enable = true;
-    withUWSM = true;
-    xwayland.enable = true;
- };
+
   programs.xfconf.enable = true;
 
  # SSH DAEMON
   services.openssh.enable = true;
 
+ # GREETD
   services.greetd = {
     enable = true;
     settings = {
       default_session = {
-        command = "start-hyprland";
+        command = "niri-session";
           user = "DeitaBug";
                         };
                };
